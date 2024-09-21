@@ -1,4 +1,6 @@
 from django.db import models
+from image.validators.image_validators import validate_product_image_size, validate_image_file_extension
+from image.image_path import product_image_upload_path
 
 class Category(models.Model):
     name = models.CharField(
