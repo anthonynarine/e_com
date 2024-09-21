@@ -17,3 +17,4 @@ class StoreConfig(AppConfig):
         Django starts the application.
         """
         import store.signals  # Import the signals module
+        import store.logging_signals 

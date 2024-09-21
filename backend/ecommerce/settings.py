@@ -2,6 +2,10 @@
 
 from pathlib import Path
 import os
+from .logging_conf import julia_fiesta_logs
+
+# Setup logging configurations
+julia_fiesta_logs()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

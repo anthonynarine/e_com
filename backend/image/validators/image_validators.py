@@ -6,30 +6,53 @@ import os
 # the image using the Image.open(image) method and checks its dimenstion. 
 # it does not modify the image or path to the image. it reads to acces the dimenstions
 
-def validate_product_image_size(image):
+from PIL import Image, ImageOps
+import os
+import logging
+
+# Configure logging
+logger = logging.getLogger(__name__)
+
+def resize_and_fit_image(image, target_size=(800, 800)):
     """
-    Validates that the uploaded image does not exceed the maximum allowed dimensions.
-    A common size for product images is around 800x800 pixels to ensure high-quality product displays.
-    
-    Args:
-        image (InMemoryUploadedFile): The uploaded image file.
-    
-    Raises:
-        ValidationError: If the image exceeds the maximum allowed dimensions.
+    Resizes and fits an image to the specified dimensions, with optimization for e-commerce.
+
+    This function scales down the image while maintaining its aspect ratio and optimizes the image
+    for the web (JPEG format with quality and size reductions).
     """
-    max_width = 800
-    max_height = 800
     
-    if image:
-        try:
-            with Image.open(image) as img:
-                if img.width > max_width or img.height > max_height:
-                    raise ValidationError(
-                        f"The maximum allowed dimensions for the image are {max_width}x{max_height} pixels. "
-                        f"The image you uploaded is {img.width}x{img.height} pixels."
-                    )
-        except Exception as e:
-            raise ValidationError(f"Invalid image file: {e}")
+    if not image or not hasattr(image, 'path'):
+        logger.warning(f"Invalid image object or missing path attribute: {image}")
+        return
+
+    if not os.path.isfile(image.path):
+        logger.warning(f"Image path does not exist or is not a valid file: {image.path}")
+        return
+
+    try:
+        with Image.open(image.path) as img:
+            logger.debug(f"Opened image: {image.path} with size: {img.size}")
+            img.thumbnail(target_size)
+            resized_size = img.size
+            logger.debug(f"Resized image size: {resized_size}")
+
+            # Create a white background (you can adjust if needed)
+            background = Image.new('RGB', target_size, (255, 255, 255))
+            offset = ((target_size[0] - resized_size[0]) // 2, (target_size[1] - resized_size[1]) // 2)
+            background.paste(img, offset)
+
+            # Create the WebP path
+            webp_path = image.path.rsplit('.', 1)[0] + '.webp'
+
+            # Save the image in WebP format
+            background.save(webp_path, format='WEBP', quality=85, optimize=True)
+
+            logger.info(f"Optimized and saved image as WebP at {webp_path}")
+
+    except Exception as e:
+        logger.error(f"Error processing image: {image.path} - {e}", exc_info=True)
+
+
 
                 
 def validate_image_file_extension(value):
