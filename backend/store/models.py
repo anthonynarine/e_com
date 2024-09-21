@@ -44,8 +44,11 @@ class Product(models.Model):
         help_text="Enter the price of the product (e.g., 99.99)."
     )
     image = models.ImageField(
-        upload_to="images/",
-        help_text="Upload an image for the product."
+        upload_to=product_image_upload_path,
+        blank=True,
+        null=True,
+        validators=[validate_image_file_extension, validate_product_image_size],
+        help_text="Upload a product image (Allowed formats: jpg, jpeg, png, gif, webp, png)"
     )
     
     class Meta:

@@ -22,8 +22,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # 3rd party
     "rest_framework", 
-    "store",  # Django app
+    # Created
+    "store.apps.StoreConfig",  # Django app handles signals
 ]
 
 MIDDLEWARE = [
